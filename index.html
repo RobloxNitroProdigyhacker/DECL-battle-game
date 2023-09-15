@@ -3,198 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Loadout</title>
+    <title>2D Shooting Game</title>
     <style>
-        /* Global Styles */
-        body {
-            background-color: #333; /* Dark background color */
-            color: #fff; /* Light text color */
-            font-family: Arial, sans-serif;
-        }
-        
         /* Add your CSS styles here */
-        .loadout-item {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px;
-            cursor: pointer;
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide overflow to prevent scrolling */
         }
-        .loadout-item:hover {
-            background-color: #eee;
-        }
-        .selected {
-            background-color: #ffcc00;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        /* Style the select menu */
-        select {
-            background-color: #444; /* Dark background color */
-            color: #fff; /* Light text color */
-            border: 1px solid #666; /* Darker border color */
-            padding: 8px;
-            font-size: 16px;
-            border-radius: 4px;
-        }
-        select:hover {
-            background-color: #555; /* Dark hover background color */
-        }
-        select:focus {
-            outline: none; /* Remove the outline on focus */
-        }
-
-        /* Style the SELECT button */
-        #selectButton {
-            background-color: #ffcc00; /* Yellow button color */
-            color: #333; /* Dark text color */
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #selectButton:hover {
-            background-color: #ffdb4d; /* Lighter yellow on hover */
-        }
-
-        /* Style the new UI */
-        #newUI {
-            display: none;
-            background-color: #fff; /* White background color */
-            color: #333; /* Dark text color */
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
-            position: relative;
-        }
-        #stickman {
-            width: 100px;
-            height: 100px;
-            background-color: #000;
-            border-radius: 50%;
-            margin: 20px auto;
-            position: absolute;
-        }
-        #stickman .head {
-            width: 30px;
-            height: 30px;
-            background-color: #000;
-            border-radius: 50%;
-            position: absolute;
-            top: 10px;
-            left: 35px;
-        }
-        #stickman .body {
-            width: 10px;
-            height: 50px;
-            background-color: #000;
-            position: absolute;
-            top: 40px;
-            left: 45px;
-        }
-        #stickman .arm-left,
-        #stickman .arm-right {
-            width: 20px;
-            height: 5px;
-            background-color: #000;
-            position: absolute;
-            top: 40px;
-        }
-        #stickman .arm-left {
-            left: 35px;
-        }
-        #stickman .arm-right {
-            left: 50px;
-        }
-        #stickman .leg-left,
-        #stickman .leg-right {
-            width: 5px;
-            height: 20px;
-            background-color: #000;
-            position: absolute;
-            top: 90px;
-        }
-        #stickman .leg-left {
-            left: 40px;
-        }
-        #stickman .leg-right {
-            left: 55px;
+        canvas {
+            background-color: #000; /* Black background color for the game area */
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
 <body>
-    <h1>Select a Team</h1>
-    <select id="teamSelect">
-        <option value="team1">Team 1</option>
-        <option value="team2">Team 2</option>
-        <option value="team3">Team 3</option>
-    </select>
-
-    <h2>Loadout</h2>
-    <div id="loadoutContainer"></div>
-
-    <h2>Selected Weapon</h2>
-    <div id="selectedWeapon"></div>
-
-    <button id="selectButton">SELECT</button>
-
-    <h2>Leaderboard</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Player</th>
-                <th>Score</th>
-            </tr>
-        </thead>
-        <tbody id="leaderboardBody">
-            <!-- Leaderboard rows will be dynamically added here -->
-        </tbody>
-    </table>
-
-    <!-- New UI for character selection -->
-    <div id="newUI">
-        <h2>Your Character</h2>
-        <div id="stickman">
-            <div class="head"></div>
-            <div class="body"></div>
-            <div class="arm-left"></div>
-            <div class="arm-right"></div>
-            <div class="leg-left"></div>
-            <div class="leg-right"></div>
-        </div>
-    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
 
     <script>
-        // Sample weapon data for each team
-        const teams = {
-            team1: [
-                { name: 'Shotgun', type: 'Semi-Auto', damage: 80, image: 'shotgun.png' },
-                { name: 'Pistol', type: 'Semi-Auto', damage: 40, image: 'pistol.png' },
-            ],
-            team2: [
-                { name: 'Assault Rifle', type: 'Automatic', damage: 60, image: 'assault_rifle.png' },
-                { name: 'Sniper Rifle', type: 'Bolt-Action', damage: 100, image: 'sniper_rifle.png' },
-            ],
-            team3: [
-                { name: 'SMG', type: 'Automatic', damage: 50, image: 'smg.png' },
-                { name: 'Grenade Launcher', type: 'Single Shot', damage: 120, image: 'grenade_launcher.png' },
-            ],
+        // Get the canvas context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Player properties
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            speed: 5,
         };
 
-        const teamSelect = document.getElementById('teamSelect');
-        const loadoutContainer = document.getElementById('loadoutContainer');
-        const selectButton = document.getElementById('selectButton');
-        const selectedWeaponDisplay = document.getElementById('selectedWeapon');
-        const leaderboardBody = document.getElementById('leaderboardBody');
-        const newUI = document.getElementById('newUI');
-        const stickman = document.getElementById('stickman');
+        // Bullets array
+        const bullets = [];
 
+        // Targets array
+        const targets = [
+            { x: 100, y: 100, radius: 20 },
+            { x: 300, y: 200, radius: 30 },
+            { x: 500, y: 300, radius: 25 },
+        ];
+
+        // Handle player movement
+        function movePlayer(event) {
+            const keyCode = event.keyCode;
+            switch (keyCode) {
+                case 37: // Left arrow key
+                    player.x -= player.speed;
+                    break;
+                case 38: // Up arrow key
+                    player.y -= player.speed;
+                    break;
+                case 39: // Right arrow key
+                    player.x += player.speed;
+                    break;
+                case 40: // Down arrow key
+                    player.y += player.speed;
+                    break;
+            }
+        }
+
+        // Handle player shooting
+        function shoot(event) {
+            const keyCode = event.keyCode;
+            if (keyCode === 32) { // Spacebar
+                const bullet = {
+                    x: player.x,
+                    y: player.y,
+                    speed: 10,
+                    radius: 5,
+                };
+                bullets.push(bullet);
+            }
+        }
+
+        // Detect collisions between bullets and targets
+        function detectCollisions() {
+            for (let i = 0; i < bullets.length; i++) {
+                for (let j = 0; j < targets.length; j++) {
+                    const dx = bullets[i].x - targets[j].x;
+                    const dy = bullets[i].y - targets[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < bullets[i].radius + targets[j].radius) {
+                        // Collision detected, remove the bullet and target
+                        bullets.splice(i, 1);
+                        targets.splice(j, 1);
+                        i--; // Adjust the index after removing the bullet
+                    }
+                }
+            }
+        }
+
+        // Main game loop
+        function gameLoop() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the player (for demonstration purposes, a simple square is used)
+            ctx.fillStyle = '#00f'; // Blue color
+            ctx.fillRect(player.x - 10, player.y - 10, 20, 20); // Draw a square for the player
+
+            // Draw bullets
+            ctx.fillStyle = '#f00'; // Red color
+            bullets.forEach((bullet) => {
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw targets
+            ctx.fillStyle = '#0f0'; // Green color
+            targets.forEach((target) => {
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Detect collisions
+            detectCollisions();
+
+            // Request the next frame
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Add event listeners for player movement and shooting
+        window.addEventListener('keydown', movePlayer);
+        window.addEventListener('keydown', shoot);
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
