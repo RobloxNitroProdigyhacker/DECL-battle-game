@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Loadout</title>
     <style>
+        /* Global Styles */
+        body {
+            background-color: #333; /* Dark background color */
+            color: #fff; /* Light text color */
+            font-family: Arial, sans-serif;
+        }
+        
         /* Add your CSS styles here */
         .loadout-item {
             border: 1px solid #ccc;
@@ -26,6 +33,36 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: left;
+        }
+
+        /* Style the select menu */
+        select {
+            background-color: #444; /* Dark background color */
+            color: #fff; /* Light text color */
+            border: 1px solid #666; /* Darker border color */
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+        select:hover {
+            background-color: #555; /* Dark hover background color */
+        }
+        select:focus {
+            outline: none; /* Remove the outline on focus */
+        }
+
+        /* Style the SELECT button */
+        #selectButton {
+            background-color: #ffcc00; /* Yellow button color */
+            color: #333; /* Dark text color */
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #selectButton:hover {
+            background-color: #ffdb4d; /* Lighter yellow on hover */
         }
     </style>
 </head>
