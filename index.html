@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Loadout</title>
+    <style>
+        /* Add your CSS styles here */
+        .loadout-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .loadout-item:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select a Team</h1>
+    <select id="teamSelect">
+        <option value="team1">Team 1</option>
+        <option value="team2">Team 2</option>
+        <option value="team3">Team 3</option>
+    </select>
+
+    <h2>Loadout</h2>
+    <div id="loadoutContainer"></div>
+
+    <button id="selectButton">SELECT</button>
+
+    <script>
+        // Sample weapon data for each team
+        const teams = {
+            team1: [
+                { name: 'Shotgun', type: 'Semi-Auto', damage: 80 },
+                { name: 'Pistol', type: 'Semi-Auto', damage: 40 },
+            ],
+            team2: [
+                { name: 'Assault Rifle', type: 'Automatic', damage: 60 },
+                { name: 'Sniper Rifle', type: 'Bolt-Action', damage: 100 },
+            ],
+            team3: [
+                { name: 'SMG', type: 'Automatic', damage: 50 },
+                { name: 'Grenade Launcher', type: 'Single Shot', damage: 120 },
+            ],
+        };
+
+        const teamSelect = document.getElementById('teamSelect');
+        const loadoutContainer = document.getElementById('loadoutContainer');
+        const selectButton = document.getElementById('selectButton');
+
+        // Function to populate the loadout container based on selected team
+        function populateLoadout() {
+            const selectedTeam = teamSelect.value;
+            const weapons = teams[selectedTeam];
+
+            // Clear the previous loadout
+            loadoutContainer.innerHTML = '';
+
+            // Create loadout items
+            weapons.forEach((weapon) => {
+                const item = document.createElement('div');
+                item.classList.add('loadout-item');
+                item.innerHTML = `<h3>${weapon.name}</h3>
+                                  <p>Type: ${weapon.type}</p>
+                                  <p>Damage: ${weapon.damage}</p>`;
+                loadoutContainer.appendChild(item);
+            });
+        }
+
+        // Event listener for team selection change
+        teamSelect.addEventListener('change', populateLoadout);
+
+        // Event listener for the SELECT button (you can add functionality here)
+        selectButton.addEventListener('click', () => {
+            const selectedTeam = teamSelect.value;
+            // You can access the selected weapons here and implement the desired functionality
+            // For example, spawn the selected weapons for the player.
+            console.log(`Selected Team: ${selectedTeam}`);
+        });
+
+        // Initial population of the loadout
+        populateLoadout();
+    </script>
+</body>
+</html>
