@@ -11,19 +11,23 @@
             overflow: hidden; /* Hide overflow to prevent scrolling */
         }
         canvas {
-            background-color: #000; /* Black background color for the game area */
-            display: block;
-            margin: 0 auto;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas"></canvas>
 
     <script>
         // Get the canvas context
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Set canvas size to match screen size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
         // Player properties
         const player = {
@@ -36,11 +40,17 @@
         const bullets = [];
 
         // Targets array
-        const targets = [
-            { x: 100, y: 100, radius: 20 },
-            { x: 300, y: 200, radius: 30 },
-            { x: 500, y: 300, radius: 25 },
-        ];
+        const targets = [];
+
+        // Create a target
+        function createTarget() {
+            const target = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: 20,
+            };
+            targets.push(target);
+        }
 
         // Handle player movement
         function movePlayer(event) {
@@ -70,8 +80,44 @@
                     y: player.y,
                     speed: 10,
                     radius: 5,
+                    direction: getDirection(keyCode),
                 };
                 bullets.push(bullet);
+            }
+        }
+
+        // Get the direction based on the keyCode
+        function getDirection(keyCode) {
+            switch (keyCode) {
+                case 37: // Left arrow key
+                    return { x: -1, y: 0 };
+                case 38: // Up arrow key
+                    return { x: 0, y: -1 };
+                case 39: // Right arrow key
+                    return { x: 1, y: 0 };
+                case 40: // Down arrow key
+                    return { x: 0, y: 1 };
+                default:
+                    return { x: 0, y: 0 }; // Default: no movement
+            }
+        }
+
+        // Update bullet positions based on direction
+        function updateBullets() {
+            for (let i = 0; i < bullets.length; i++) {
+                bullets[i].x += bullets[i].speed * bullets[i].direction.x;
+                bullets[i].y += bullets[i].speed * bullets[i].direction.y;
+
+                // Remove bullets that go out of bounds
+                if (
+                    bullets[i].x < 0 ||
+                    bullets[i].x > canvas.width ||
+                    bullets[i].y < 0 ||
+                    bullets[i].y > canvas.height
+                ) {
+                    bullets.splice(i, 1);
+                    i--;
+                }
             }
         }
 
@@ -102,6 +148,9 @@
             ctx.fillStyle = '#00f'; // Blue color
             ctx.fillRect(player.x - 10, player.y - 10, 20, 20); // Draw a square for the player
 
+            // Update bullet positions based on direction
+            updateBullets();
+
             // Draw bullets
             ctx.fillStyle = '#f00'; // Red color
             bullets.forEach((bullet) => {
@@ -131,6 +180,9 @@
 
         // Start the game loop
         gameLoop();
+
+        // Generate targets at intervals
+        setInterval(createTarget, 3000);
     </script>
 </body>
 </html>
