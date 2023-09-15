@@ -18,6 +18,15 @@
         .selected {
             background-color: #ffcc00;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -35,6 +44,19 @@
     <div id="selectedWeapon"></div>
 
     <button id="selectButton">SELECT</button>
+
+    <h2>Leaderboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboardBody">
+            <!-- Leaderboard rows will be dynamically added here -->
+        </tbody>
+    </table>
 
     <script>
         // Sample weapon data for each team
@@ -57,6 +79,7 @@
         const loadoutContainer = document.getElementById('loadoutContainer');
         const selectButton = document.getElementById('selectButton');
         const selectedWeaponDisplay = document.getElementById('selectedWeapon');
+        const leaderboardBody = document.getElementById('leaderboardBody');
 
         let selectedWeapon = null;
 
@@ -110,11 +133,25 @@
         selectButton.addEventListener('click', () => {
             if (selectedWeapon !== null) {
                 // Implement logic to spawn the character with the selected weapon here
-                console.log('Character spawned with weapon:', teams[teamSelect.value][selectedWeapon]);
+
+                // For demonstration purposes, let's add a dummy entry to the leaderboard
+                const playerName = prompt('Enter your name:');
+                if (playerName) {
+                    const playerScore = Math.floor(Math.random() * 1000); // Random score for demonstration
+                    addPlayerToLeaderboard(playerName, playerScore);
+                }
             } else {
                 alert('Please select a weapon before spawning the character.');
             }
         });
+
+        // Function to add a player to the leaderboard
+        function addPlayerToLeaderboard(playerName, playerScore) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `<td>${playerName}</td>
+                                <td>${playerScore}</td>`;
+            leaderboardBody.appendChild(newRow);
+        }
 
         // Initial population of the loadout
         populateLoadout();
