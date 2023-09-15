@@ -64,6 +64,71 @@
         #selectButton:hover {
             background-color: #ffdb4d; /* Lighter yellow on hover */
         }
+
+        /* Style the new UI */
+        #newUI {
+            display: none;
+            background-color: #fff; /* White background color */
+            color: #333; /* Dark text color */
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            position: relative;
+        }
+        #stickman {
+            width: 100px;
+            height: 100px;
+            background-color: #000;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: absolute;
+        }
+        #stickman .head {
+            width: 30px;
+            height: 30px;
+            background-color: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 35px;
+        }
+        #stickman .body {
+            width: 10px;
+            height: 50px;
+            background-color: #000;
+            position: absolute;
+            top: 40px;
+            left: 45px;
+        }
+        #stickman .arm-left,
+        #stickman .arm-right {
+            width: 20px;
+            height: 5px;
+            background-color: #000;
+            position: absolute;
+            top: 40px;
+        }
+        #stickman .arm-left {
+            left: 35px;
+        }
+        #stickman .arm-right {
+            left: 50px;
+        }
+        #stickman .leg-left,
+        #stickman .leg-right {
+            width: 5px;
+            height: 20px;
+            background-color: #000;
+            position: absolute;
+            top: 90px;
+        }
+        #stickman .leg-left {
+            left: 40px;
+        }
+        #stickman .leg-right {
+            left: 55px;
+        }
     </style>
 </head>
 <body>
@@ -95,6 +160,19 @@
         </tbody>
     </table>
 
+    <!-- New UI for character selection -->
+    <div id="newUI">
+        <h2>Your Character</h2>
+        <div id="stickman">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="arm-left"></div>
+            <div class="arm-right"></div>
+            <div class="leg-left"></div>
+            <div class="leg-right"></div>
+        </div>
+    </div>
+
     <script>
         // Sample weapon data for each team
         const teams = {
@@ -117,81 +195,6 @@
         const selectButton = document.getElementById('selectButton');
         const selectedWeaponDisplay = document.getElementById('selectedWeapon');
         const leaderboardBody = document.getElementById('leaderboardBody');
+        const newUI = document.getElementById('newUI');
+        const stickman = document.getElementById('stickman');
 
-        let selectedWeapon = null;
-
-        // Function to populate the loadout container based on selected team
-        function populateLoadout() {
-            const selectedTeam = teamSelect.value;
-            const weapons = teams[selectedTeam];
-
-            // Clear the previous loadout
-            loadoutContainer.innerHTML = '';
-
-            // Create loadout items
-            weapons.forEach((weapon, index) => {
-                const item = document.createElement('div');
-                item.classList.add('loadout-item');
-                item.innerHTML = `<h3>${weapon.name}</h3>
-                                  <p>Type: ${weapon.type}</p>
-                                  <p>Damage: ${weapon.damage}</p>`;
-                item.addEventListener('click', () => selectWeapon(weapon, index));
-                loadoutContainer.appendChild(item);
-            });
-        }
-
-        // Function to select a weapon
-        function selectWeapon(weapon, index) {
-            // Remove the previous selection
-            if (selectedWeapon !== null) {
-                const previousSelectedItem = loadoutContainer.children[selectedWeapon];
-                previousSelectedItem.classList.remove('selected');
-            }
-
-            // Highlight the selected item
-            const selectedItem = loadoutContainer.children[index];
-            selectedItem.classList.add('selected');
-
-            // Update the selected weapon
-            selectedWeapon = index;
-
-            // Display the selected weapon
-            selectedWeaponDisplay.innerHTML = `<h3>Selected Weapon</h3>
-                                                <p>Name: ${weapon.name}</p>
-                                                <p>Type: ${weapon.type}</p>
-                                                <p>Damage: ${weapon.damage}</p>
-                                                <img src="${weapon.image}" alt="${weapon.name}" width="100">`;
-        }
-
-        // Event listener for team selection change
-        teamSelect.addEventListener('change', populateLoadout);
-
-        // Event listener for the SELECT button
-        selectButton.addEventListener('click', () => {
-            if (selectedWeapon !== null) {
-                // Implement logic to spawn the character with the selected weapon here
-
-                // For demonstration purposes, let's add a dummy entry to the leaderboard
-                const playerName = prompt('Enter your name:');
-                if (playerName) {
-                    const playerScore = Math.floor(Math.random() * 1000); // Random score for demonstration
-                    addPlayerToLeaderboard(playerName, playerScore);
-                }
-            } else {
-                alert('Please select a weapon before spawning the character.');
-            }
-        });
-
-        // Function to add a player to the leaderboard
-        function addPlayerToLeaderboard(playerName, playerScore) {
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `<td>${playerName}</td>
-                                <td>${playerScore}</td>`;
-            leaderboardBody.appendChild(newRow);
-        }
-
-        // Initial population of the loadout
-        populateLoadout();
-    </script>
-</body>
-</html>
