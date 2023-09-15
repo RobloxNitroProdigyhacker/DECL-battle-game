@@ -11,9 +11,9 @@
             overflow: hidden; /* Hide overflow to prevent scrolling */
         }
         canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+            background-color: #000; /* Black background color for the game area */
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -25,7 +25,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Set canvas size to match screen size
+        // Fullscreen canvas
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -33,7 +33,6 @@
         const player = {
             x: canvas.width / 2,
             y: canvas.height / 2,
-            speed: 5,
         };
 
         // Bullets array
@@ -42,89 +41,43 @@
         // Targets array
         const targets = [];
 
-        // Create a target
-        function createTarget() {
-            const target = {
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: 20,
-            };
-            targets.push(target);
-        }
-
-        // Handle player movement
-        function movePlayer(event) {
-            const keyCode = event.keyCode;
-            switch (keyCode) {
-                case 37: // Left arrow key
-                    player.x -= player.speed;
-                    break;
-                case 38: // Up arrow key
-                    player.y -= player.speed;
-                    break;
-                case 39: // Right arrow key
-                    player.x += player.speed;
-                    break;
-                case 40: // Down arrow key
-                    player.y += player.speed;
-                    break;
-            }
-        }
-
-        // Handle player shooting
+        // Handle player shooting with mouse
         function shoot(event) {
-            const keyCode = event.keyCode;
-            if (keyCode === 32) { // Spacebar
-                const bullet = {
-                    x: player.x,
-                    y: player.y,
-                    speed: 100, // Increased bullet speed to 100
-                    radius: 5,
-                    direction: getDirection(keyCode),
-                };
-                bullets.push(bullet);
-            }
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+
+            const bullet = {
+                x: player.x,
+                y: player.y,
+                speed: 100,
+                radius: 5,
+                direction: {
+                    x: mouseX - player.x,
+                    y: mouseY - player.y,
+                },
+            };
+
+            // Normalize the direction vector
+            const length = Math.sqrt(bullet.direction.x ** 2 + bullet.direction.y ** 2);
+            bullet.direction.x /= length;
+            bullet.direction.y /= length;
+
+            bullets.push(bullet);
         }
 
-        // Get the direction based on the keyCode
-        function getDirection(keyCode) {
-            switch (keyCode) {
-                case 37: // Left arrow key
-                    return { x: -1, y: 0 };
-                case 38: // Up arrow key
-                    return { x: 0, y: -1 };
-                case 39: // Right arrow key
-                    return { x: 1, y: 0 };
-                case 40: // Down arrow key
-                    return { x: 0, y: 1 };
-                default:
-                    return { x: 0, y: 0 }; // Default: no movement
-            }
-        }
+        // Generate random targets
+        function generateTargets() {
+            const radius = Math.random() * 30 + 10; // Random radius between 10 and 40
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
 
-        // Update bullet positions based on direction
-        function updateBullets() {
-            for (let i = 0; i < bullets.length; i++) {
-                bullets[i].x += bullets[i].speed * bullets[i].direction.x;
-                bullets[i].y += bullets[i].speed * bullets[i].direction.y;
-
-                // Remove bullets that go out of bounds
-                if (
-                    bullets[i].x < 0 ||
-                    bullets[i].x > canvas.width ||
-                    bullets[i].y < 0 ||
-                    bullets[i].y > canvas.height
-                ) {
-                    bullets.splice(i, 1);
-                    i--;
-                }
-            }
+            targets.push({ x, y, radius });
         }
 
         // Detect collisions between bullets and targets
         function detectCollisions() {
-            for (let i = 0; i < bullets.length; i++) {
-                for (let j = 0; j < targets.length; j++) {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = targets.length - 1; j >= 0; j--) {
                     const dx = bullets[i].x - targets[j].x;
                     const dy = bullets[i].y - targets[j].y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -133,7 +86,6 @@
                         // Collision detected, remove the bullet and target
                         bullets.splice(i, 1);
                         targets.splice(j, 1);
-                        i--; // Adjust the index after removing the bullet
                     }
                 }
             }
@@ -144,12 +96,11 @@
             // Clear the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw the player (for demonstration purposes, a simple square is used)
-            ctx.fillStyle = '#00f'; // Blue color
-            ctx.fillRect(player.x - 10, player.y - 10, 20, 20); // Draw a square for the player
-
-            // Update bullet positions based on direction
-            updateBullets();
+            // Update bullet positions based on direction and speed
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].x += bullets[i].speed * bullets[i].direction.x;
+                bullets[i].y += bullets[i].speed * bullets[i].direction.y;
+            }
 
             // Draw bullets
             ctx.fillStyle = '#f00'; // Red color
@@ -170,19 +121,20 @@
             // Detect collisions
             detectCollisions();
 
+            // Generate new targets periodically
+            if (Math.random() < 0.02) {
+                generateTargets();
+            }
+
             // Request the next frame
             requestAnimationFrame(gameLoop);
         }
 
-        // Add event listeners for player movement and shooting
-        window.addEventListener('keydown', movePlayer);
-        window.addEventListener('keydown', shoot);
+        // Add event listener for shooting with the mouse
+        window.addEventListener('mousedown', shoot);
 
         // Start the game loop
         gameLoop();
-
-        // Generate targets at intervals
-        setInterval(createTarget, 3000);
     </script>
 </body>
 </html>
